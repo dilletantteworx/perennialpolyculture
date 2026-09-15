@@ -1,24 +1,18 @@
-f(water)
+f(water)               [include saturation penalty]
 f(sunlight)
-f(N)
-f(P)
-f(K)
-f(OM)
-f(pH)
-f(micronutrients)
+f(temperature)         [ADD: ultra-high]
+f(soil_structure)      [ADD: ultra-high]
+f(N), f(P), f(K), f(OM), f(pH), f(micronutrients)
+f(transpiration_biomass)  [ADD: high; bridges water & pests]
 f(pests)
+f(disease)             [ADD or MERGE with pests: high]
 f(pollinators)
 f(fungi)
-f(happy meals)
-
+f(frost_freeze_events) [ADD: moderate]
+f(labor_management)    [ADD: yield ceiling]
 Location Vector (static)
-
 Location Vector (dynamic)
-
 Plant Matrix
-
 Yield
-
 Stability Analysis
-
 Carbon Sequestration
