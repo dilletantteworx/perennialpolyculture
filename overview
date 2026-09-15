@@ -13,6 +13,11 @@ f(labor_management)    [ADD: yield ceiling]
 Location Vector (static)
 Location Vector (dynamic)
 Plant Matrix
-Yield
+Yield = [f(water) × f(sunlight) × f(temperature) × f(soil_structure) 
+         × f(N) × f(P) × f(K) × f(pH) × f(micronutrients)
+         × (1 − f(pests)) × (1 − f(disease)) × f(pollinators)
+         × (1 − f(frost_freeze_events))
+         × f(labor_management)]
+         × [potential_yield_for_species]
 Stability Analysis
 Carbon Sequestration
