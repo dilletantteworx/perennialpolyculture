@@ -1,0 +1,42 @@
+Phase 1: Acquisition (Free)
+User downloads app, enters location, performs DIY soil test (or upgrades to mail-in lab).
+Cost to you: Hosting, soil-type lookup tables, weather API calls.
+User value: Immediate guild candidates (no lab wait); transparency on uncertainty.
+Phase 2: Guild Refinement (Freemium)
+Lab results arrive; app refines guilds with actual NPK data.
+Free tier: See top 3 guilds, basic water/fertilizer recommendations.
+Premium tier: Full guild ranking, labor/cost breakdown, multi-year budget templates, market-price integration, herbicide risk mapping, bulk supplier directory.
+Cost to you: Minimal incremental (already computed); monetization trigger.
+Phase 3: Deployment & Ongoing Reporting (Data Goldmine)
+User plants guild, logs observations via app: phenology photos, pest counts, yield harvest data, water inputs, labor hours, soil amendment applications.
+Free: Basic yield tracking; comparison to guild baseline.
+Premium: Detailed ROI dashboard, seasonal forecasting, anomaly alerts, network benchmarking (anonymized).
+Cost to you: Cloud storage for observations; minimal compute.
+Phase 4: Model Improvement (Academic + Product Value)
+Aggregate anonymized user data (100+ sites across climate/soil zones).
+Publication cycle: Annual peer-reviewed papers on model validation, guild performance, pest-control efficacy, labor efficiency.
+Product loop: Retrain functions (f(water), f(pests), f(labor)) on real-world data; push updates to app.
+User incentive: Co-authorship pathway for high-quality data reporters; premium tools (labor scheduling, market forecasting) funded by research grants or corporate sponsors.
+Cost to you: Statistical analysis, writing, student/postdoc labor (grant-funded ideally).
+Phase 5: Corporate Adoption (Scale)
+Target: Agribusinesses, land trusts, conservation districts needing site-specific recommendations.
+Offering: White-label guild builder + reporting dashboard; API for bulk site evaluation.
+Revenue: Licensing ($per-site or per-year), data-sharing agreements, or commission on input reductions (e.g., "we saved you 40% fertilizer—take 5%").
+Your cost: API maintenance, integration support.
+Revenue Streams & Timeline
+
+Phase	Timeline	Revenue	Cost Driver
+Acquisition	Month 1–6	$0 (free)	Hosting, API calls
+Freemium/Premium	Month 6+	$5–$15/user/month (10% conversion assumed)	Cloud storage, support
+Data Reporting	Month 12+	Grants, sponsorships ($50k–$200k/yr)	Research FTE, publication
+Corporate Licensing	Month 18+	$5k–$50k/partner/yr	API, integration, support
+The Data Loop: Feedback Mechanism
+
+User reports: "My nitrogen guild underperformed; here's my soil test recheck + yield data."
+You aggregate: 50 similar soil–climate reports showing 15% shortfall in N-response function.
+Recalibrate: 
+f
+(nitrogen)
+f(nitrogen) now includes a regional modifier or soil-type interaction.
+Push update: App notifies user of model improvement; guild rankings shift.
+Publish: "Regional Variation in Nitrogen Response in Perennial Polycultures" (co-authors: top 10 data reporters).
