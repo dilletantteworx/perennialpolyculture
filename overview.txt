@@ -1,14 +1,18 @@
 Overview
 
-Yield estimator for perennial polyculture. Each location has a vector of salient information, some static (annual rainfall, depth to bedrock, expected temperature profile, etc...), L, and some dynamic, A (soil composition, soil temperature (as under canopy), water table depth, etc...). Each plant has a vector of requirements which must fit into the current location vector as well as a collection of nutrition vectors for each salient period during a growing season. Some plants add N over the year, some subtract in April, etc... Using Liebig's law and dimensional analysis equations, we estimate yield of guilds whose steady state improves soil quality. Future improvements will include carbon capture estimates to monetize un-harvested biomass. To build appropriate guilds, first choose anchor and secondary species, add flowers to satisfy pollinator/parasitoid requirement, then add nitrogen fixers and other soil nutrition specialist plants to ensure the guild's nutrition balances and that the guild achieves an appropriate level of ground cover to prevent weeds. Then check the yield. 
+Mechanistic yield estimator for perennial polyculture using linear algebra. Each location has a vector of salient information, some static (annual rainfall, depth to bedrock, expected temperature profile, etc...), L, and some dynamic, A (soil composition, soil temperature (as under canopy), water table depth, etc...). Each plant has a vector of requirements which must fit into the current location vector as well as a collection of nutrition vectors for each salient period during a growing season. Plants in the canopy also get direct sunlight whereas ground-covers get the least direct light. Some plants add N over the year, some subtract in April, etc... Using Liebig's law and dimensional analysis equations, we estimate yield of guilds whose steady state improves soil quality. Future improvements will include carbon capture estimates to monetize un-harvested biomass. 
 
-f(water)               [include saturation penalty]
+To build appropriate guilds, first choose anchor and secondary species, add flowers to satisfy pollinator/parasitoid calendar and density requirements, then add nitrogen fixers and other soil nutrition promoter plants to ensure the guild's nutrition balances and that the guild achieves an appropriate level of ground cover to prevent weeds. Check that root penetration depths vary enough to build a small subsurface reservoir without becoming waterlogged. Finally check the yield against historical pricing. 
+
+The following resource functions accept a number representing that available resource and return a number between 0 and 1 with a negligible range below which meaningful growth cannot occur, a linear ramp up to a near-maximal range followed by a toxicity range which may have a slope or may simply cut off to a zero output. We rely on existing information to populate the plant vectors and their resource response functions, but this level of data is not necessarily available. When closely related plants have the requisite data, we substitute that.
+
+f(water)               [include saturation penalty] https://besjournals.onlinelibrary.wiley.com/doi/full/10.1111/1365-2745.14313
 f(sunlight)
 f(temperature)         [ADD: ultra-high]
 f(soil_structure)      [ADD: ultra-high]
 f(N), f(P), f(K), f(OM), f(pH), f(micronutrients)
 f(transpiration_biomass)  [ADD: high; bridges water & pests]
-f(disease)             [ADD or MERGE with pests: high]
+f(fungi)
 
 f(pollinators, parasitoids) — Minimal Guild Approximation
 
@@ -17,6 +21,7 @@ f(pollinators, parasitoids) — Minimal Guild Approximation
 Definition
 
 For a guild comprising a tentpole crop plus companion plants in intercropped layout, pollinator service and parasitoid pest suppression are coupled through nectar availability.
+
 Operational Thresholds
 
 Nectar Continuity: Maximum bloom gap across guild ≤ 7 days during main flowering season.
@@ -68,7 +73,16 @@ Mitigation: User-reported bloom dates and pest counts refine parameters; high-qu
 
 
 
-f(fungi)
+The following resources represent threats to yield and are of the form (1-expected_loss) to be compatible with Liebig's law.
+
+f(disease) = 1 - (baseline_disease_pressure) 
+              × (1 - diversity_protection) 
+              × (1 - canopy_humidity_effect)
+
+baseline_disease_pressure is specific to guild species
+diversity_protection = 1 − (c × H) where 'c' is .1 and then fitted based on results and H is the Shannon diversity index: https://en.wikipedia.org/wiki/Diversity_index 
+canopy_humidity_effect is 
+
 f(frost_freeze_events) [ADD: moderate]
 f(labor_management)    [ADD: yield ceiling]
 Location Vector (static)
