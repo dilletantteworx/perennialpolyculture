@@ -1,12 +1,73 @@
+Overview
+
+Yield estimator for perennial polyculture. Each location has a vector of salient information, some static (annual rainfall, depth to bedrock, expected temperature profile, etc...), L, and some dynamic, A (soil composition, soil temperature (as under canopy), water table depth, etc...). Each plant has a vector of requirements which must fit into the current location vector as well as a collection of nutrition vectors for each salient period during a growing season. Some plants add N over the year, some subtract in April, etc... Using Liebig's law and dimensional analysis equations, we estimate yield of guilds whose steady state improves soil quality. Future improvements will include carbon capture estimates to monetize un-harvested biomass. To build appropriate guilds, first choose anchor and secondary species, add flowers to satisfy pollinator/parasitoid requirement, then add nitrogen fixers and other soil nutrition specialist plants to ensure the guild's nutrition balances and that the guild achieves an appropriate level of ground cover to prevent weeds. Then check the yield. 
+
 f(water)               [include saturation penalty]
 f(sunlight)
 f(temperature)         [ADD: ultra-high]
 f(soil_structure)      [ADD: ultra-high]
 f(N), f(P), f(K), f(OM), f(pH), f(micronutrients)
 f(transpiration_biomass)  [ADD: high; bridges water & pests]
-f(pests)
 f(disease)             [ADD or MERGE with pests: high]
-f(pollinators)
+
+f(pollinators, parasitoids) — Minimal Guild Approximation
+
+
+
+Definition
+
+For a guild comprising a tentpole crop plus companion plants in intercropped layout, pollinator service and parasitoid pest suppression are coupled through nectar availability.
+Operational Thresholds
+
+Nectar Continuity: Maximum bloom gap across guild ≤ 7 days during main flowering season.
+Boolean: nectar_continuous = (max_gap ≤ 7 days)
+Spatial Density: Mean distance between nectar sources ≤ 10 m.
+Boolean: density_adequate = (mean_distance ≤ 10 m)
+Bloom Calendar: Constructed from extension phenology data (±1 week regional uncertainty) and cultivar-specific flowering windows.
+Nectar Supply (optional refinement): Weekly sum of nectar production across blooming plants:
+
+
+Nectar(t) = SUM over plants in bloom of (flowers/plant) * (nectar/flower/day)
+where nectar per flower varies 2–5x with temperature, soil moisture, and nitrogen.
+Parasitoid Suppression
+
+Pest suppression via nectar-attracted parasitoids:
+
+
+f(pests) = exp( -alpha * I[nectar\_continuous] - beta * I[density\_adequate] - gamma * H )
+where:
+I[.] = indicator function (1 if true, 0 if false)
+H = Shannon diversity index of guild species composition
+alpha, beta ≈ 0.3–0.5 (backward-fitted from field parasitoid data)
+gamma ≈ 0.1–0.2 (diversity penalty coefficient)
+Combined Statement
+
+Primary form (for publication):
+
+
+f(pollinators, parasitoids) = (1 - f(pests)) * I[nectar\_continuous] * I[density\_adequate]
+Alternative form (with penalty for unmet thresholds):
+
+
+f(pollinators, parasitoids) = { (1 - f(pests))                if nectar\_continuous AND density\_adequate
+                               { (1 - 0.5 * f(pests))         otherwise
+Interpretation
+
+If both thresholds are met, pollinator visits to tentpole crop are assumed adequate (from literature crop-specific requirements) and parasitoid pest suppression is active.
+If either threshold is unmet, pest suppression is reduced or absent.
+Pesticide/disease pressures are handled separately in f(disease) and f(frost) terms.
+Data Uncertainty
+
+Bloom timing: ±1–2 weeks (regional phenology model error).
+Nectar per flower: 2–5x range (temperature, moisture, nitrogen sensitivity).
+Flowers per plant: Cultivar- and weather-dependent; rarely published.
+Parasitoid parameterization: Backward-fitted from field data; alpha, beta, gamma have ±20–30% uncertainty.
+Pollinator demand: Crop-specific visit requirements are literature values; guild-context demand is untested.
+Mitigation: User-reported bloom dates and pest counts refine parameters; high-quality reporters eligible for co-authorship.
+
+
+
+
 f(fungi)
 f(frost_freeze_events) [ADD: moderate]
 f(labor_management)    [ADD: yield ceiling]
