@@ -1,98 +1,138 @@
-Overview
+# YIELD ESTIMATOR: PERENNIAL POLYCULTURE
 
-Mechanistic yield estimator for perennial polyculture using linear algebra. Each location has a vector of salient information, some static (annual rainfall, depth to bedrock, expected temperature profile, etc...), L, and some dynamic, A (soil composition, soil temperature (as under canopy), water table depth, etc...). Each plant has a vector of requirements which must fit into the current location vector as well as a collection of nutrition vectors for each salient period during a growing season. Plants in the canopy also get direct sunlight whereas ground-covers get the least direct light. Some plants add N over the year, some subtract in April, etc... Using Liebig's law and dimensional analysis equations, we estimate yield of guilds whose steady state improves soil quality. Future improvements will include carbon capture estimates to monetize un-harvested biomass. 
+## OVERVIEW
 
-To build appropriate guilds, first choose anchor and secondary species, add flowers to satisfy pollinator/parasitoid calendar and density requirements, then add nitrogen fixers and other soil nutrition promoter plants to ensure the guild's nutrition balances and that the guild achieves an appropriate level of ground cover to prevent weeds. Check that root penetration depths vary enough to build a small subsurface reservoir without becoming waterlogged. Finally check the yield against historical pricing. 
+Mechanistic yield model for perennial polyculture guilds using linear algebra.
+Estimates yield for guild steady-states that improve soil quality.
 
-The following resource functions accept a number representing that available resource and return a number between 0 and 1 with a negligible range below which meaningful growth cannot occur, a linear ramp up to a near-maximal range followed by a toxicity range which may have a slope or may simply cut off to a zero output. We rely on existing information to populate the plant vectors and their resource response functions, but this level of data is not necessarily available. When closely related plants have the requisite data, we substitute that.
+Location is characterized by two vectors:
+  L (static):   annual rainfall, depth to bedrock, temperature profile, etc.
+  A (dynamic):  soil composition, soil temperature (under canopy), water table depth, etc.
 
-f(water)               [include saturation penalty] https://besjournals.onlinelibrary.wiley.com/doi/full/10.1111/1365-2745.14313
+Plants have:
+  - Requirement vectors (must fit current L and A)
+  - Nutrition vectors for each salient growing season period
+  - Canopy tier (direct sun) or groundcover tier (least sun)
+
+Future: Carbon capture monetization for un-harvested biomass.
+
+## GUILD ASSEMBLY
+
+1. Choose anchor and secondary species.
+2. Add flowers: satisfy pollinator/parasitoid calendar and density.
+3. Add nitrogen fixers and soil nutrition specialists: balance nutrition, achieve ground cover, prevent weeds.
+4. Check root penetration depths vary adequately; avoid waterlogging.
+5. Check yield against historical pricing.
+
+## RESOURCE FUNCTIONS
+
+Form: f(resource) ∈ [0, 1]
+  - Below threshold: negligible growth
+  - Linear ramp: threshold to near-maximal range
+  - Toxicity range: slope or cutoff to zero
+
+Data source: Published plant vectors and resource response functions.
+Substitution: Use closely related species if direct data unavailable.
+
+### Resource Functions (Primary)
+f(water)               [saturation penalty applied]
 f(sunlight)
-f(temperature)         [ADD: ultra-high]
-f(soil_structure)      [ADD: ultra-high]
+f(temperature)         [TODO: ultra-high threshold]
+f(soil_structure)      [TODO: ultra-high threshold]
 f(N), f(P), f(K), f(OM), f(pH), f(micronutrients)
-f(transpiration_biomass)  [ADD: high; bridges water & pests]
+f(transpiration_biomass)  [TODO: high; couples water & pests]
 f(fungi)
 
-f(pollinators, parasitoids) — Minimal Guild Approximation
+### Loss Functions (Form: 1 − expected_loss)
+(1 − f(pests))
+(1 − f(disease))
+(1 − f(frost_freeze_events))  [TODO: moderate priority]
+f(labor_management)          [TODO: yield ceiling]
 
+## f(POLLINATORS, PARASITOIDS) — MINIMAL GUILD APPROXIMATION
 
+### Operational Thresholds
 
-Definition
+**Nectar Continuity**
+  nectar_continuous = (max_gap ≤ 7 days) during main flowering season
 
-For a guild comprising a tentpole crop plus companion plants in intercropped layout, pollinator service and parasitoid pest suppression are coupled through nectar availability.
+**Spatial Density**
+  density_adequate = (mean_distance ≤ 10 m) between nectar sources
 
-Operational Thresholds
+**Bloom Calendar**
+  Extension phenology data ± 1 week; cultivar-specific windows.
 
-Nectar Continuity: Maximum bloom gap across guild ≤ 7 days during main flowering season.
-Boolean: nectar_continuous = (max_gap ≤ 7 days)
-Spatial Density: Mean distance between nectar sources ≤ 10 m.
-Boolean: density_adequate = (mean_distance ≤ 10 m)
-Bloom Calendar: Constructed from extension phenology data (±1 week regional uncertainty) and cultivar-specific flowering windows.
-Nectar Supply (optional refinement): Weekly sum of nectar production across blooming plants:
+**Nectar Supply** (optional refinement)
+  Nectar(t) = SUM(flowers/plant × nectar/flower/day)
+  where nectar/flower varies 2–5x with temperature, soil moisture, N.
 
+### Parasitoid Suppression
 
-Nectar(t) = SUM over plants in bloom of (flowers/plant) * (nectar/flower/day)
-where nectar per flower varies 2–5x with temperature, soil moisture, and nitrogen.
-Parasitoid Suppression
+f(pests) = exp(−α·I[nectar_continuous] − β·I[density_adequate] − γ·H)
 
-Pest suppression via nectar-attracted parasitoids:
-
-
-f(pests) = exp( -alpha * I[nectar\_continuous] - beta * I[density\_adequate] - gamma * H )
 where:
-I[.] = indicator function (1 if true, 0 if false)
-H = Shannon diversity index of guild species composition
-alpha, beta ≈ 0.3–0.5 (backward-fitted from field parasitoid data)
-gamma ≈ 0.1–0.2 (diversity penalty coefficient)
-Combined Statement
+  I[·]           = indicator (1 if true, 0 if false)
+  H              = Shannon diversity index (guild species)
+  α, β           ≈ 0.3–0.5 (backward-fitted from field data)
+  γ              ≈ 0.1–0.2 (diversity penalty coefficient)
+  Uncertainty:   ±20–30% on α, β, γ
 
-Primary form (for publication):
+### Combined Statement
 
+**Primary form:**
+f(pollinators, parasitoids) = (1 − f(pests)) × I[nectar_continuous] × I[density_adequate]
 
-f(pollinators, parasitoids) = (1 - f(pests)) * I[nectar\_continuous] * I[density\_adequate]
-Alternative form (with penalty for unmet thresholds):
+**Alternative form** (penalty for unmet thresholds):
+f(pollinators, parasitoids) = 
+  {  (1 − f(pests))          if nectar_continuous AND density_adequate
+  {  (1 − 0.5·f(pests))      otherwise
 
+### Interpretation
 
-f(pollinators, parasitoids) = { (1 - f(pests))                if nectar\_continuous AND density\_adequate
-                               { (1 - 0.5 * f(pests))         otherwise
-Interpretation
+- Thresholds met: pollinator visits adequate; parasitoid suppression active.
+- Thresholds unmet: suppression reduced or absent.
+- Pesticide and disease are separate: f(disease), f(frost).
 
-If both thresholds are met, pollinator visits to tentpole crop are assumed adequate (from literature crop-specific requirements) and parasitoid pest suppression is active.
-If either threshold is unmet, pest suppression is reduced or absent.
-Pesticide/disease pressures are handled separately in f(disease) and f(frost) terms.
-Data Uncertainty
+### Data Uncertainty
 
-Bloom timing: ±1–2 weeks (regional phenology model error).
-Nectar per flower: 2–5x range (temperature, moisture, nitrogen sensitivity).
-Flowers per plant: Cultivar- and weather-dependent; rarely published.
-Parasitoid parameterization: Backward-fitted from field data; alpha, beta, gamma have ±20–30% uncertainty.
-Pollinator demand: Crop-specific visit requirements are literature values; guild-context demand is untested.
-Mitigation: User-reported bloom dates and pest counts refine parameters; high-quality reporters eligible for co-authorship.
+Bloom timing:              ±1–2 weeks (phenology model error)
+Nectar per flower:         2–5x range (T, moisture, N sensitivity)
+Flowers per plant:         Cultivar/weather-dependent; rarely published
+Pollinator demand:         Crop-specific literature; guild-context untested
+Mitigation:               User-reported bloom dates & pest counts refine parameters;
+                          high-quality reporters eligible for co-authorship.
 
+## f(DISEASE)
 
+**Form:**
+f(disease) = baseline × [1 − (c_local × H_guild) − (c_landscape × H_landscape)]
 
+where:
+  baseline                = species- and location-specific baseline pressure
+  H_guild                 = Shannon diversity within 3–5 species guild (~1.0–1.6)
+  H_landscape             = surrounding ecosystem diversity (0 = barren, 1 = unmanaged forest)
+  c_local                 ≈ 0.10–0.15 (within-guild suppression)
+  c_landscape             ≈ 0.05–0.10 (landscape dilution benefit)
 
-The following resources represent threats to yield and are of the form (1-expected_loss) to be compatible with Liebig's law.
+**Baseline Determination:**
+  - Parameterize from location climate (spring temperature, rainfall frequency, leaf-wetness hours).
+  - Regional extension pathology records or literature tables by species/zone.
+  - Alternative: Location dynamic vector (A) includes humidity; use max expected humidity + 20% margin
+    and select cultivars tolerant to that threshold; bypass explicit humidity calculation.
 
-f(disease) = 1 - (baseline_disease_pressure) 
-              × (1 - diversity_protection) 
-              × (1 - canopy_humidity_effect)
+**NOTE:** Canopy humidity effect is embedded in baseline; separate calculation deferred to v2 (thinner understory modeling).
 
-baseline_disease_pressure is specific to guild species
-diversity_protection = 1 − (c × H) where 'c' is .1 and then fitted based on results and H is the Shannon diversity index: https://en.wikipedia.org/wiki/Diversity_index 
-canopy_humidity_effect is 
+## YIELD FORMULA
 
-f(frost_freeze_events) [ADD: moderate]
-f(labor_management)    [ADD: yield ceiling]
-Location Vector (static)
-Location Vector (dynamic)
-Plant Matrix
-Yield = [f(water) × f(sunlight) × f(temperature) × f(soil_structure) 
+Yield = [f(water) × f(sunlight) × f(temperature) × f(soil_structure)
          × f(N) × f(P) × f(K) × f(pH) × f(micronutrients)
-         × (1 − f(pests)) × (1 − f(disease)) × f(pollinators)
+         × (1 − f(pests)) × (1 − f(disease))
+         × f(pollinators, parasitoids)
          × (1 − f(frost_freeze_events))
          × f(labor_management)]
-         × [potential_yield_for_species]
-Stability Analysis
-Carbon Sequestration
+        × [potential_yield_for_species]
+
+## TODO / FUTURE
+
+- Stability analysis (soil carbon trajectory, nutrient closure).
+- Carbon sequestration monetization.
