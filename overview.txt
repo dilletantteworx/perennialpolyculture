@@ -3,13 +3,23 @@
 ## OVERVIEW
 
 Mechanistic yield model for perennial polyculture guilds using linear algebra.
-Estimates yield for guild steady-states that improve soil quality.
+Estimates yield at arbitrary locations and is consistent with known science for monocultures and other types of intercropping and permaculture style guilds.
 
 Location is characterized by two vectors:
-  L (static):   annual rainfall, depth to bedrock, temperature profile, etc.
-  A (dynamic):  soil composition, soil temperature (under canopy), water table depth, etc.
 
-Plants have:
+## Location Vector (L)
+
+Static characteristics: Annual rainfall (mm), rainfall seasonality, depth to bedrock (m), 
+soil parent material, baseline soil texture (% sand, silt, clay), temperature profile 
+(mean annual, growing season, min winter), last spring frost date (median ± σ), 
+first fall frost date (median ± σ), historical freeze event frequency and severity (°C), 
+mid-winter thaw frequency (events/decade), elevation (m), slope and aspect (°).
+
+## Dynamic Location Vector (A)
+
+Soil composition, soil temperature (under canopy), water table depth, etc.
+
+## Plants have:
   - Requirement vectors (must fit current L and A)
   - Nutrition vectors for each salient growing season period
   - Canopy tier (direct sun) or groundcover tier (least sun)
@@ -29,6 +39,7 @@ Future: Carbon capture monetization for un-harvested biomass.
 Form: f(resource) ∈ [0, 1]
   - Below threshold: negligible growth
   - Linear ramp: threshold to near-maximal range
+  - Maximal range: Approximate as 1
   - Toxicity range: slope or cutoff to zero
 
 Data source: Published plant vectors and resource response functions.
