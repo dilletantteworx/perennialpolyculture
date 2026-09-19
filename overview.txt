@@ -28,7 +28,7 @@ Future: Carbon capture monetization for un-harvested biomass.
 
 ## GUILD ASSEMBLY
 
-1. Choose anchor and secondary species.
+1. Choose anchor and secondary species such that no pair blooms coincidentally
 2. Add flowers: satisfy pollinator/parasitoid calendar and density.
 3. Add nitrogen fixers and soil nutrition specialists: balance nutrition, achieve ground cover, prevent weeds.
 4. Check root penetration depths vary adequately; avoid waterlogging.
@@ -132,6 +132,105 @@ where:
     and select cultivars tolerant to that threshold; bypass explicit humidity calculation.
 
 **NOTE:** Canopy humidity effect is embedded in baseline; separate calculation deferred to v2 (thinner understory modeling).
+
+## f(FROST): Phenological Frost Damage
+
+## Abstract Definition
+
+f(frost) = ∏_i [1 − L_i(T_min, T_hardy_i, W_soil, Y_loss_i)]
+  (independent per-crop loss terms, no synchrony penalty)
+
+where phase ∈ {spring, fall, thaw}
+
+## Severity Function (Abstraction)
+
+Define buffering factor:
+  B(W_soil) = 1 − β_w × (W_soil / W_FC)
+  
+where β_w is soil-dependent moisture buffering coefficient, W_FC is field capacity.
+
+Define conditional loss:
+  L_sev(T_min, T_hardy, W_soil, Y_loss) = 
+    0                           if T_min > T_hardy
+    Y_loss × B(W_soil)          if T_min ≤ T_hardy
+
+## Phenophase Loss Terms
+
+L_spring = P(frost | bloom) × L_sev(T_min, T_bloom_hardy, W_soil, Y_loss_bloom) × (1 − R_secondary)
+
+L_fall = P(frost | ripen) × L_sev(T_min, T_fruit_hardy, W_soil, Y_loss_fruit)
+
+L_thaw = (f_thaw / 10) × P(bud_burst_early) × δ_thaw
+
+where:
+  P(frost | phase) = probability frost occurs during phenophase (from historical records + GDD)
+  T_bloom_hardy, T_fruit_hardy = species cold hardiness thresholds by phenophase
+  Y_loss_bloom, Y_loss_fruit = species yield-loss-per-event parameters (0–1)
+  R_secondary = secondary bloom probability (0–1)
+  f_thaw = mid-winter thaw events per decade (location vector)
+  P(bud_burst_early) = species-specific probability of false bud break during thaw
+  δ_thaw = yield loss per thaw event (0–1)
+
+All temperature, probability, and yield terms are species and location attributes; 
+B(W_soil) couples the function to dynamic soil moisture.
+
+---
+
+# f(temperature): Synergistic Temperature–Water Response
+
+## Abstraction
+
+Define optimal temperature response (independent):
+  f_T(T) = piecewise linear ramp [T_min_opt, T_opt_low] → [1, 1] → [T_opt_high, T_max_opt]
+  
+Define transpirational cooling effect:
+  f_W(W, T) = 1 − γ_cool × max(0, T − T_baseline) × (1 − W_soil / W_FC)
+
+## Combined Function
+
+f(temperature) = f_T(T) × f_W(W, T)
+
+where:
+  T = growing season mean or instantaneous temperature (context-dependent)
+  W_soil, W_FC = current and field-capacity soil moisture
+  γ_cool = transpiration effectiveness coefficient (species and climate dependent)
+  T_baseline = reference temperature above which cooling is needed
+
+Interpretation: Temperature stress is reduced by soil moisture availability; wet soil 
+allows transpirational cooling, dry soil amplifies heat stress. Below T_min_opt or 
+above T_max_opt, both terms approach zero independently; synergy occurs in mid-range.
+
+---
+
+# f(water): Soil Moisture Resource Function
+
+## Definition
+
+f(water) = piecewise linear:
+  0                           if W_soil < W_crit_low
+  (W_soil − W_crit_low) / W_range    if W_crit_low ≤ W_soil ≤ W_opt
+  1 − α_sat × (W_soil − W_opt)²      if W_opt < W_soil ≤ W_FC
+  penaltyₛₐₜ                   if W_soil > W_FC
+
+where:
+  W_soil = current volumetric soil moisture (%)
+  W_crit_low, W_opt = species-specific critical and optimal moisture thresholds
+  W_range = W_opt − W_crit_low
+  α_sat = saturation penalty curvature (species dependent)
+  penaltyₛₐₜ = baseline penalty for waterlogging (e.g., 0.3–0.7, species/soil dependent)
+
+Interpretation: Below critical threshold, no growth; linear ramp to optimum; 
+quadratic decline above optimum; cliff drop into saturation.
+
+---
+
+# Coupling: f(temperature) ↔ f(water) ↔ f(frost_freeze_events)
+
+Water availability buffers temperature extremes via latent heat (modeled in f_W(W,T) above).
+Soil moisture also reduces frost severity (via B(W_soil) in frost function).
+In dry conditions, both heat and cold stress increase synergistically.
+
+Implementation: Compute f(water) first; pass W_soil to f(temperature) and f(frost_freeze_events).
 
 ## YIELD FORMULA
 
