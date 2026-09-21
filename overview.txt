@@ -120,10 +120,10 @@ f(disease) = baseline × [1 − (c_local × H_guild) − (c_landscape × H_lands
 
 where:
   baseline                = species- and location-specific baseline pressure
-  H_guild                 = Shannon diversity within 3–5 species guild (~1.0–1.6)
+  H_guild                 = Shannon diversity within guild
   H_landscape             = surrounding ecosystem diversity (0 = barren, 1 = unmanaged forest)
-  c_local                 ≈ 0.10–0.15 (within-guild suppression)
-  c_landscape             ≈ 0.05–0.10 (landscape dilution benefit)
+  c_local                 ≈ (find values) within-guild suppression 
+  c_landscape             ≈ (find values) landscape dilution benefit (size of farm impacts proportion)
 
 **Baseline Determination:**
   - Parameterize from location climate (spring temperature, rainfall frequency, leaf-wetness hours).
@@ -161,6 +161,7 @@ L_spring = P(frost | bloom) × L_sev(T_min, T_bloom_hardy, W_soil, Y_loss_bloom)
 L_fall = P(frost | ripen) × L_sev(T_min, T_fruit_hardy, W_soil, Y_loss_fruit)
 
 L_thaw = (f_thaw / 10) × P(bud_burst_early) × δ_thaw
+L_thaw = (f_thaw / 10) × P(bud_burst_early) × δ_thaw × [1 − B(W_soil)]
 
 where:
   P(frost | phase) = probability frost occurs during phenophase (from historical records + GDD)
